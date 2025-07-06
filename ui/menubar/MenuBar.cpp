@@ -6,13 +6,13 @@
 namespace lambdaOS {
 namespace ui {
 
-MenuBar::MenuBar() : m_launcherIcon("") {}
+MenuBar::MenuBar() : m_launcherIcon("icons/Launcher.svg") {}
 MenuBar::~MenuBar() {}
 
 void MenuBar::loadIcons() {
     if (m_iconsLoaded) return;
     // Load launcher icon (replace with your actual path)
-    std::ifstream file("ui/menubar/icons/launcher.svg");
+    std::ifstream file("icons/Launcher.svg");
     std::stringstream buffer;
     buffer << file.rdbuf();
     m_launcherIcon = SVGImage(buffer.str());
