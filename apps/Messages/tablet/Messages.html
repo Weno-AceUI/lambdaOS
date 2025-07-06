@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAce Messages</title>
+    <style>
+        body {
+            /* Path assumes messages_app.html is served from build/apps/Messages/ 
+               and acepaper.png is in build/ui_assets/ */
+            background: url('../../../ui/components/home/acepaper.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 md:p-8">
+    <div class="glass rounded-3xl shadow-lg w-full max-w-md md:max-w-4xl p-4 md:p-6 flex flex-col" style="height: 85vh; max-height: 800px; overflow-y: auto;">
+        <h1 class="text-3xl font-bold text-center mb-6 text-white">Messages</h1>
+
+        <div class="flex-1 md:flex md:space-x-6 text-white">
+            <!-- Left Pane: Conversation List -->
+            <div class="md:w-1/2 flex flex-col">
+                <h2 class="text-2xl font-semibold mb-4 text-white md:hidden text-center">Conversations</h2> <!-- Visible on Mobile -->
+                <div id="conversationList" class="flex-1 overflow-y-auto space-y-2">
+                    <!-- Placeholder for conversation items -->
+                    <div class="glass p-3 rounded-lg shadow-md cursor-pointer hover:bg-white/20">
+                        <p class="font-semibold">John Doe</p>
+                        <p class="text-sm text-white/70 truncate">Hey, are you free later? Let's catch up...</p>
+                    </div>
+                    <div class="glass p-3 rounded-lg shadow-md cursor-pointer hover:bg-white/20">
+                        <p class="font-semibold">Jane Smith</p>
+                        <p class="text-sm text-white/70 truncate">Meeting at 3 PM confirmed.</p>
+                    </div>
+                    <div class="glass p-3 rounded-lg text-center shadow-md">Loading conversations...</div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Message View (Initially hidden on mobile) -->
+            <div id="messageView" class="md:w-1/2 flex flex-col md:block">
+                <h2 class="text-2xl font-semibold mb-4 text-white text-center">Conversation</h2>
+                <div id="messageList" class="flex-1 overflow-y-auto space-y-2">
+                    <p class="text-white text-center">Select a conversation to view messages.</p>  <!-- Placeholder -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Message Input Area (Now outside the panes, full width at bottom) -->
+        <div class="md:hidden mt-4">  <!-- Only visible on mobile -->
+            <div class="mt-auto">
+                <div class="glass p-3 rounded-lg shadow-lg flex items-center">
+                    <input type="text" id="messageInput" placeholder="Type a message..." class="glass flex-grow text-white placeholder-white/60 p-2 rounded-lg mr-2 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">
+                    <button class="glass px-4 py-2 rounded-lg text-white font-semibold shadow-md hover:bg-white/20" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message Input Area (Tablet - inside messageView) -->
+        <div class="md:block hidden mt-4" id="tabletInputArea">  <!-- Only visible on tablet -->
+            <div class="mt-auto">
+                <div class="glass p-3 rounded-lg shadow-lg flex items-center">
+                    <input type="text" id="tabletMessageInput" placeholder="Type a message..." class="glass flex-grow text-white placeholder-white/60 p-2 rounded-lg mr-2 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">
+                    <button class="glass px-4 py-2 rounded-lg text-white font-semibold shadow-md hover:bg-white/20" onclick="sendTabletMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadConversations() {
+            const listElement = document.getElementById('conversationList');
+            // In a real app, you'd fetch and render conversations here.
+            // For now, the static placeholders will remain.
+            // You might want to clear the "Loading..." message if you fetch dynamically.
+            const loadingMessage = listElement.querySelector('.text-center');
+            if (loadingMessage && loadingMessage.textContent.includes('Loading')) {
+                // listElement.innerHTML = ''; // Or hide the loading message
+            }
+            // console.log("loadConversations called - placeholder");  <- Commented out the log.
+        }
+
+        async function sendMessage() {
+            const inputElement = document.getElementById('messageInput');
+            const messageText = inputElement.value.trim();
+
+            if (!messageText) {
+                alert('Please type a message.');
+                return;
+            }
+
+            console.log(`Sending message: ${messageText}`);
+            // Placeholder for API call
+            // try {
+            //     const response = await fetch('/api/messages', {
+            //         method: 'POST',
+            //         headers: { 'Content-Type': 'application/json' },
+            //         body: JSON.stringify({ recipient: "current_conversation_id", text: messageText })
+            //     });
+            //     if (!response.ok) throw new Error('Failed to send message');
+            //     const result = await response.json();
+            //     alert(result.message || 'Message sent!');
+            //     inputElement.value = '';
+            //     // Potentially refresh message view or add message to UI
+            // } catch (error) {
+            //     console.error('Error sending message:', error);
+            //     alert('Error sending message.');
+            // }
+            alert(`Message "${messageText}" would be sent. (Not implemented for mobile view)`);
+            inputElement.value = ''; // Clear input after "sending"
+        }
+
+        async function sendTabletMessage() {
+            const inputElement = document.getElementById('tabletMessageInput');
+            const messageText = inputElement.value.trim();
+
+            if (!messageText) {
+                alert('Please type a message.');
+                return;
+            }
+
+            console.log(`Sending message (Tablet View): ${messageText}`);
+            // Placeholder for API call (same as sendMessage, but for tablet input)
+            // try { ... } catch (error) { ... }
+            alert(`Message "${messageText}" would be sent (Tablet view - not implemented).`);
+            inputElement.value = '';
+        }
+
+        function showConversation(conversationId) {
+            // In a real app, this would load messages for the selected conversation
+            // and update the messageView div. For now, it's a placeholder.
+            const messageList = document.getElementById('messageList');
+            if (messageList) {
+                messageList.innerHTML = `<p class="text-white">Messages for conversation ${conversationId} would be displayed here. (Not implemented)</p>`;
+            }
+
+            const inputElement = document.getElementById('tabletMessageInput');
+            inputElement.value = ''; // Clear input after "sending"
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadConversations();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAce Settings</title>
+    <style>
+        body {
+            /* Path assumes settings_app.html is served from build/apps/Settings/ 
+               and acepaper.png is in build/ui_assets/ */
+            background: url('../../../ui/components/home/acepaper.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 md:p-8">
+    <div class="glass rounded-3xl shadow-lg w-full max-w-md md:max-w-4xl p-4 md:p-6 flex flex-col" style="height: 85vh; max-height: 800px; overflow-y: auto;">
+        <h1 class="text-3xl font-bold text-center mb-6 text-white">Settings</h1>
+
+        <div class="flex-1 md:flex md:space-x-6 text-white">
+            <!-- Left Pane: Settings Categories -->
+            <div class="md:w-1/3 flex flex-col">
+                <div id="settingsList" class="space-y-3 overflow-y-auto">
+                    <div class="glass p-4 rounded-lg shadow-md cursor-pointer hover:bg-white/20" onclick="showSettingDetails('display')">
+                        <h2 class="text-lg font-semibold">Display</h2>
+                        <p class="text-sm text-white/70">Brightness, wallpaper, sleep</p>
+                    </div>
+                    <div class="glass p-4 rounded-lg shadow-md cursor-pointer hover:bg-white/20" onclick="showSettingDetails('sound')">
+                        <h2 class="text-lg font-semibold">Sound</h2>
+                        <p class="text-sm text-white/70">Volume, ringtones, vibration</p>
+                    </div>
+                    <div class="glass p-4 rounded-lg shadow-md cursor-pointer hover:bg-white/20" onclick="showSettingDetails('network')">
+                        <h2 class="text-lg font-semibold">Network & Internet</h2>
+                        <p class="text-sm text-white/70">Wi-Fi, mobile, hotspot</p>
+                    </div>
+                    <div class="glass p-4 rounded-lg shadow-md cursor-pointer hover:bg-white/20" onclick="showSettingDetails('about')">
+                        <h2 class="text-lg font-semibold">About Phone</h2>
+                        <p class="text-sm text-white/70">System updates, device info</p>
+                    </div>
+                    <!-- Add more settings items here -->
+                </div>
+            </div>
+
+            <!-- Right Pane: Setting Details -->
+            <div id="settingDetails" class="md:w-2/3 flex flex-col mt-6 md:mt-0 p-4 glass rounded-lg shadow-md overflow-y-auto">
+                <h2 id="settingDetailTitle" class="text-2xl font-semibold mb-4 text-center">Select a category</h2>
+                <div id="settingDetailContent">
+                    <p class="text-center text-white/70">Details for the selected setting will appear here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSettingDetails(settingId) {
+            const detailTitleElement = document.getElementById('settingDetailTitle');
+            const detailContentElement = document.getElementById('settingDetailContent');
+
+            // Clear previous content
+            detailContentElement.innerHTML = '';
+
+            // Placeholder content based on settingId
+            // In a real app, you'd fetch or generate more complex HTML here
+            switch (settingId) {
+                case 'display':
+                    detailTitleElement.textContent = 'Display Settings';
+                    detailContentElement.innerHTML = '<p>Brightness, wallpaper, and sleep options would be here.</p><div class="mt-4"><label for="brightness" class="block text-sm font-medium">Brightness:</label><input type="range" id="brightness" name="brightness" min="0" max="100" value="70" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"></div>';
+                    break;
+                case 'sound':
+                    detailTitleElement.textContent = 'Sound Settings';
+                    detailContentElement.innerHTML = '<p>Volume, ringtones, and vibration settings would be here.</p>';
+                    break;
+                case 'network':
+                    detailTitleElement.textContent = 'Network & Internet';
+                    detailContentElement.innerHTML = '<p>Wi-Fi, mobile data, and hotspot settings would be here.</p>';
+                    break;
+                case 'about':
+                    detailTitleElement.textContent = 'About Phone';
+                    detailContentElement.innerHTML = '<p>System updates, device model, OS version, etc.</p>';
+                    break;
+                default:
+                    detailTitleElement.textContent = 'Select a category';
+                    detailContentElement.innerHTML = '<p class="text-center text-white/70">Details for the selected setting will appear here.</p>';
+            }
+        }
+
+        // Optional: Highlight the selected item in the list
+        document.querySelectorAll('#settingsList > div').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('#settingsList > div').forEach(i => i.classList.remove('bg-white/30')); // Remove highlight from others
+                this.classList.add('bg-white/30'); // Add highlight to clicked item
+            });
+        });
+    </script>
+</body>
+</html>

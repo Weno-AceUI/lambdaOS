@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_subdirectory(kernel)
 add_subdirectory(ui)
 add_subdirectory(webcpp)
+add_subdirectory(apps)
 
 # Optionally add tools if needed
 # add_subdirectory(tools)

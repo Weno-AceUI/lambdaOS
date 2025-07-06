@@ -1,0 +1,14 @@
+ui main_window = Window("OpenAce Phone");
+ui background = BackgroundColor("#FFFFFF");
+main_window.add(background);
+
+ui nav = TabBar();
+ui dial_tab = Tab("Dial", Label("Dialpad goes here"));
+ui contacts_tab = Tab("Contacts", Label("Contacts go here"));
+ui history_tab = Tab("History", Label("History goes here"));
+
+nav.addTab(dial_tab);
+nav.addTab(contacts_tab);
+nav.addTab(history_tab);
+
+main_window.add(nav);

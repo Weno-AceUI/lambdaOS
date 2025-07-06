@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAce Music</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: url('../../../ui/components/home/acepaper.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* Main layout */
+        .music-container {
+            display: flex;
+            height: 100vh;
+            padding-bottom: 90px; /* Space for the now playing bar */
+            box-sizing: border-box;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: 300px;
+            background-color: rgba(0,0,0,0.2);
+            padding: 2.5rem;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sidebar-item {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-align: left;
+            border-radius: 12px;
+            border: 3px solid transparent;
+            transition: all 0.2s ease-in-out;
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .sidebar-item:focus {
+            outline: none;
+            transform: scale(1.05);
+            border-color: #ffffff;
+            background-color: rgba(255,255,255,0.15);
+        }
+
+        /* Main Content */
+        #main-content {
+            flex-grow: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        #main-content::-webkit-scrollbar { display: none; }
+        #main-content { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 3px solid transparent;
+            transition: all 0.2s ease-in-out;
+            margin-bottom: 0.5rem;
+        }
+
+        .song-item:focus {
+            outline: none;
+            border-color: #ffffff;
+            background-color: rgba(255,255,255,0.15);
+        }
+
+        .song-item .album-art {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        /* Now Playing Bar */
+        #now-playing-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 90px;
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 2.5rem;
+            gap: 1.5rem;
+        }
+        #now-playing-bar .album-art {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="music-container">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar">
+            <h1 class="text-4xl font-bold tracking-wide mb-8">Music</h1>
+            <button class="sidebar-item focusable" data-panel="sidebar">Library</button>
+            <button class="sidebar-item focusable" data-panel="sidebar">Playlists</button>
+            <button class="sidebar-item focusable" data-panel="sidebar">Artists</button>
+            <button class="sidebar-item focusable" data-panel="sidebar">Albums</button>
+            <button class="sidebar-item focusable" data-panel="sidebar">Search</button>
+        </nav>
+
+        <!-- Main Content: Song List -->
+        <main id="main-content">
+            <h2 class="text-3xl font-semibold mb-6">All Songs</h2>
+            <div id="song-list">
+                <!-- Songs will be loaded here by JavaScript -->
+                <p id="loadingMessage" class="text-2xl py-10">Loading music...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Now Playing Bar -->
+    <footer id="now-playing-bar">
+        <img id="nowPlayingArt" src="" alt="Album Art" class="album-art">
+        <div>
+            <div id="nowPlayingTitle" class="text-xl font-semibold">No Song Playing</div>
+            <div id="nowPlayingArtist" class="text-base text-white/70">Unknown Artist</div>
+        </div>
+        <!-- Playback controls could go here if needed -->
+    </footer>
+
+    <script>
+        // Mock data for demonstration
+        const mockSongs = [
+            { title: "Midnight City", artist: "M83", duration: "4:04" },
+            { title: "Bohemian Rhapsody", artist: "Queen", duration: "5:55" },
+            { title: "Stairway to Heaven", artist: "Led Zeppelin", duration: "8:02" },
+            { title: "Hotel California", artist: "Eagles", duration: "6:30" },
+            { title: "Smells Like Teen Spirit", artist: "Nirvana", duration: "5:01" },
+            { title: "Billie Jean", artist: "Michael Jackson", duration: "4:54" },
+            { title: "Like a Rolling Stone", artist: "Bob Dylan", duration: "6:13" },
+            { title: "Hey Jude", artist: "The Beatles", duration: "7:11" },
+            { title: "Wonderwall", artist: "Oasis", duration: "4:18" },
+            { title: "Sweet Child O' Mine", artist: "Guns N' Roses", duration: "5:56" },
+        ];
+
+        const songList = document.getElementById('song-list');
+        const loadingMessage = document.getElementById('loadingMessage');
+
+        function loadSongs() {
+            loadingMessage.style.display = 'none';
+            songList.innerHTML = ''; // Clear
+
+            mockSongs.forEach((song, index) => {
+                const songItem = document.createElement('button');
+                songItem.className = 'song-item focusable w-full';
+                songItem.dataset.panel = 'content';
+                songItem.innerHTML = `
+                    <div class="text-2xl text-white/50 w-10 text-center">${index + 1}</div>
+                    <img src="https://via.placeholder.com/128/333/FFF?text=♪" alt="Album Art" class="album-art">
+                    <div class="flex-grow text-left">
+                        <div class="text-xl font-medium">${song.title}</div>
+                        <div class="text-base text-white/70">${song.artist}</div>
+                    </div>
+                    <div class="text-lg text-white/70">${song.duration}</div>
+                `;
+                songItem.onclick = () => playSong(song);
+                songList.appendChild(songItem);
+            });
+
+            setupNavigation();
+        }
+
+        function playSong(song) {
+            console.log("Playing:", song.title);
+            document.getElementById('nowPlayingTitle').textContent = song.title;
+            document.getElementById('nowPlayingArtist').textContent = song.artist;
+            // In a real app, you'd also update the album art
+            // document.getElementById('nowPlayingArt').src = song.artUrl;
+        }
+
+        // D-Pad Navigation
+        function setupNavigation() {
+            const focusableElements = document.querySelectorAll('.focusable');
+            if (focusableElements.length === 0) return;
+
+            let currentIndex = 0;
+            let activePanel = 'sidebar'; // 'sidebar' or 'content'
+
+            // Get all items for each panel
+            const sidebarItems = Array.from(document.querySelectorAll('[data-panel="sidebar"]'));
+            const contentItems = Array.from(document.querySelectorAll('[data-panel="content"]'));
+
+            // Focus the first item in the sidebar initially
+            sidebarItems[0]?.focus();
+            let currentSidebarIndex = 0;
+            let currentContentIndex = 0;
+
+            document.addEventListener('keydown', (e) => {
+                if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) {
+                    e.preventDefault();
+                }
+
+                if (activePanel === 'sidebar') {
+                    switch (e.key) {
+                        case 'ArrowUp':
+                            currentSidebarIndex = Math.max(0, currentSidebarIndex - 1);
+                            sidebarItems[currentSidebarIndex].focus();
+                            break;
+                        case 'ArrowDown':
+                            currentSidebarIndex = Math.min(sidebarItems.length - 1, currentSidebarIndex + 1);
+                            sidebarItems[currentSidebarIndex].focus();
+                            break;
+                        case 'ArrowRight':
+                            if (contentItems.length > 0) {
+                                activePanel = 'content';
+                                contentItems[currentContentIndex].focus();
+                                contentItems[currentContentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                            break;
+                        case 'Enter':
+                            document.activeElement.click();
+                            break;
+                    }
+                } else if (activePanel === 'content') {
+                    switch (e.key) {
+                        case 'ArrowUp':
+                            currentContentIndex = Math.max(0, currentContentIndex - 1);
+                            contentItems[currentContentIndex].focus();
+                            contentItems[currentContentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            break;
+                        case 'ArrowDown':
+                            currentContentIndex = Math.min(contentItems.length - 1, currentContentIndex + 1);
+                            contentItems[currentContentIndex].focus();
+                            contentItems[currentContentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            break;
+                        case 'ArrowLeft':
+                            activePanel = 'sidebar';
+                            sidebarItems[currentSidebarIndex].focus();
+                            break;
+                        case 'Enter':
+                            document.activeElement.click();
+                            break;
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // TODO: Replace mock data with API call
+            // if (window.MusicAPI_getSongs) { ... }
+            loadSongs();
+        });
+    </script>
+</body>
+</html>

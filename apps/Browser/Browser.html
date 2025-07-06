@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>OpenAce Browser</title>
+    <style>
+        body {
+            /* Path assumes Browser.html is served from build/apps/Browser/ 
+               and acepaper.png is in build/ui_assets/ */
+            background: url('../../ui/components/home/acepaper.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: flex; /* Use flex to structure the app */
+            flex-direction: column;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .browser-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Full viewport height */
+            width: 100%;
+        }
+        .address-bar-container {
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            /* Glass effect applied here for the bar itself */
+            background: rgba(0, 0, 0, 0.2); 
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        #urlInput {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+        #urlInput::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        #goButton {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        #goButton:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        /* The content area will be managed by WebCpp's rendering of the loaded URL */
+        /* If WebCpp uses an iframe-like approach, you'd style that iframe here */
+        /* For now, we assume WebCpp replaces the document content */
+
+    </style>
+</head>
+<body>
+    <div class="browser-container">
+        <div class="address-bar-container">
+            <input type="text" id="urlInput" placeholder="Enter URL (e.g., https://example.com)">
+            <button id="goButton">Go</button>
+        </div>
+        
+        <!-- The rest of the body will be the viewport for the loaded web page,
+             managed by WebCpp after webcpp_load_url is called.
+             Alternatively, WebCpp might render into a specific element like an iframe.
+             For simplicity, we assume it replaces the current document's content below the address bar.
+        -->
+    </div>
+
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const goButton = document.getElementById('goButton');
+
+        goButton.addEventListener('click', () => {
+            const url = urlInput.value.trim();
+            if (url && window.BrowserAPI_loadUrl) {
+                // Prefix with http:// if no protocol is specified, for basic cases
+                const fullUrl = (url.startsWith('http://') || url.startsWith('https://')) ? url : 'http://' + url;
+                window.BrowserAPI_loadUrl(fullUrl);
+            } else if (!window.BrowserAPI_loadUrl) {
+                console.error("BrowserAPI_loadUrl function not found on window object.");
+                alert("Error: Browser navigation API is not available.");
+            } else {
+                alert("Please enter a URL.");
+            }
+        });
+
+        urlInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                goButton.click();
+            }
+        });
+    </script>
+</body>
+</html>

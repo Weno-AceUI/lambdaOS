@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAce Contacts</title>
+    <style>
+        body {
+            /* Path assumes contacts_app.html is served from build/apps/Contacts/ 
+               and acepaper.png is in build/ui_assets/ */
+            background: url('../../../ui/components/home/acepaper.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 md:p-8">
+    <div class="glass rounded-3xl shadow-lg w-full max-w-md md:max-w-4xl p-4 md:p-6 flex flex-col" style="height: 85vh; max-height: 800px; overflow-y: auto;">
+        <h1 class="text-3xl font-bold text-center mb-6 text-white">Contacts</h1>
+
+        <div class="flex-1 md:flex md:space-x-6 text-white">
+            <!-- Left Pane: Search and Add Contact Form -->
+            <div class="md:w-1/3 flex flex-col">
+                <!-- Search Bar -->
+                <div class="mb-4">
+                    <input type="search" id="searchContactsInput" placeholder="Search contacts..." class="glass w-full text-white placeholder-white/60 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none shadow-lg">
+                </div>
+
+                <!-- Add New Contact Section -->
+                <div class="glass mb-6 md:mb-0 p-4 rounded-lg shadow-lg text-white">
+                    <h3 class="text-lg font-medium mb-3 text-white text-center">Add New Contact</h3>
+                    <input type="text" id="newContactName" placeholder="Name" class="glass w-full text-white placeholder-white/60 p-2 rounded-lg mb-2 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">
+                    <input type="tel" id="newContactPhone" placeholder="Phone Number" class="glass w-full text-white placeholder-white/60 p-2 rounded-lg mb-2 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">
+                    <button class="glass w-full px-4 py-2 mt-2 rounded-lg text-white font-semibold shadow-lg hover:bg-white/20" onclick="addContact()">Add Contact</button>
+                </div>
+            </div>
+
+            <!-- Right Pane: Contacts List -->
+            <div class="md:w-2/3 flex flex-col">
+                <!-- Contacts List -->
+                <ul id="contactsList" class="space-y-2 text-white flex-1 overflow-y-auto">
+                    <li class="glass p-3 rounded-lg text-center shadow-md">Loading contacts...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Basic search functionality (client-side filtering)
+        const searchInput = document.getElementById('searchContactsInput');
+        searchInput.addEventListener('input', function() {
+            const filter = searchInput.value.toLowerCase();
+            const contactsListElement = document.getElementById('contactsList');
+            const items = contactsListElement.getElementsByTagName('li');
+            for (let i = 0; i < items.length; i++) {
+                const text = items[i].textContent || items[i].innerText;
+                if (text.toLowerCase().indexOf(filter) > -1) {
+                    items[i].style.display = "";
+                } else {
+                    items[i].style.display = "none";
+                }
+            }
+        });
+
+        async function loadContacts() {
+            const listElement = document.getElementById('contactsList');
+            listElement.innerHTML = '<li class="glass text-white p-3 rounded-lg text-center shadow-md">Loading contacts...</li>';
+            try {
+                const response = await fetch('/api/contacts'); // Assuming API endpoint
+                if (!response.ok) throw new Error('Failed to fetch contacts');
+                const contacts = await response.json();
+                listElement.innerHTML = ''; // Clear loading message
+                if (contacts.length === 0) {
+                    listElement.innerHTML = '<li class="glass text-white p-3 rounded-lg text-center shadow-md">No contacts found.</li>';
+                } else {
+                    contacts.forEach(contact => {
+                        const li = document.createElement('li'); 
+                        li.className = 'glass text-white p-3 rounded-lg shadow-md flex justify-between items-center';
+                        li.textContent = `${contact.name} - ${contact.phoneNumber}`;
+                        // TODO: Add action buttons (call, edit, delete) here if needed
+                        listElement.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+                listElement.innerHTML = '<li class="glass text-white bg-red-500/30 p-3 rounded-lg text-center shadow-md">Error loading contacts.</li>';
+            }
+        }
+
+        async function addContact() {
+            const name = document.getElementById('newContactName').value;
+            const phone = document.getElementById('newContactPhone').value;
+            if (!name || !phone) {
+                alert('Please enter both name and phone number.');
+                return;
+            }
+            try {
+                const response = await fetch('/api/contacts', { // Assuming API endpoint
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: name, phoneNumber: phone })
+                });
+                if (!response.ok) {
+                     const errorData = await response.json();
+                     throw new Error(errorData.message || 'Failed to add contact');
+                }
+                const result = await response.json();
+                alert(result.message || 'Contact added!');
+                document.getElementById('newContactName').value = '';
+                document.getElementById('newContactPhone').value = '';
+                loadContacts(); // Refresh list
+            } catch (error) {
+                console.error('Error adding contact:', error);
+                alert('Error adding contact: ' + error.message);
+            }
+        }
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadContacts();
+        });
+    </script>
+</body>
+</html>
