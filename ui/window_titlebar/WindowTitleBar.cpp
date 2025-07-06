@@ -9,6 +9,9 @@ WindowTitleBar::~WindowTitleBar() {}
 
 void WindowTitleBar::draw(int x, int y, int width, const std::string& title) {
     std::cout << "Drawing title bar at (" << x << ", " << y << ") width [" << width << "] title: " << title << std::endl;
+    std::cout << "  [ICON] Minimize: ui/window_titlebar/icons/Minimize 2.svg" << std::endl;
+    std::cout << "  [ICON] Maximize: ui/window_titlebar/icons/Maximize.svg" << std::endl;
+    std::cout << "  [ICON] Close:    ui/window_titlebar/icons/close.svg" << std::endl;
 }
 
 bool WindowTitleBar::onMouseEvent(int mouseX, int mouseY, int button, bool pressed) {
