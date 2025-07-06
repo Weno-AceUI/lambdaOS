@@ -2,6 +2,8 @@
 
 #include <string>
 #include <memory>
+#include "../graphics/GraphicsContext.h"
+#include "../graphics/SVGImage.h"
 
 namespace lambdaOS {
 namespace ui {
@@ -12,7 +14,7 @@ public:
     virtual ~WindowTitleBar();
 
     // Draw the title bar
-    void draw(int x, int y, int width, const std::string& title);
+    void draw(GraphicsContext& ctx, int x, int y, int width, const std::string& title);
 
     // Handle mouse events (returns true if event was handled)
     bool onMouseEvent(int mouseX, int mouseY, int button, bool pressed);
@@ -23,6 +25,11 @@ public:
 
 private:
     std::string m_title;
+    SVGImage m_iconClose;
+    SVGImage m_iconMaximize;
+    SVGImage m_iconMinimize;
+    bool m_iconsLoaded = false;
+    void loadIcons();
 };
 
 using WindowTitleBarPtr = std::shared_ptr<WindowTitleBar>;
