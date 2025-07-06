@@ -7,6 +7,7 @@ namespace lambdaOS {
 namespace ui {
 
 class SVGImage;
+class Image;
 
 class GraphicsContext {
 public:
@@ -19,6 +20,7 @@ public:
     void drawLine(int x1, int y1, int x2, int y2, uint32_t color);
     void drawText(int x, int y, const std::string& text, uint32_t color);
     void drawSVG(int x, int y, int w, int h, const SVGImage& svg);
+    void drawImage(int x, int y, const Image& img);
     const std::vector<uint32_t>& getBuffer() const;
     int getWidth() const;
     int getHeight() const;

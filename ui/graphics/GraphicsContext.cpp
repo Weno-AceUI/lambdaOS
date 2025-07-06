@@ -1,5 +1,6 @@
 #include "GraphicsContext.h"
 #include "SVGImage.h"
+#include "Image.h"
 #include <cstring>
 #include <iostream>
 #include <cmath>
@@ -69,6 +70,18 @@ void GraphicsContext::drawSVG(int x, int y, int w, int h, const SVGImage& svg) {
     // Draw lines
     for (const auto& l : svg.lines) {
         drawLine(x + (int)l.x1, y + (int)l.y1, x + (int)l.x2, y + (int)l.y2, l.color);
+    }
+}
+
+void GraphicsContext::drawImage(int x, int y, const Image& img) {
+    int w = img.width(), h = img.height();
+    const auto& pixels = img.pixels();
+    for (int j = 0; j < h; ++j) {
+        for (int i = 0; i < w; ++i) {
+            int px = x + i, py = y + j;
+            if (px >= 0 && px < m_width && py >= 0 && py < m_height)
+                m_buffer[py * m_width + px] = pixels[j * w + i];
+        }
     }
 }
 
