@@ -9,6 +9,7 @@ namespace lambdaOS {
 namespace ui {
 
 class LauncherMenu;
+class AppMenu;
 
 class MenuBar {
 public:
@@ -22,10 +23,13 @@ private:
     void loadIcons();
     bool m_iconsLoaded = false;
     SVGImage m_launcherIcon;
+    SVGImage m_appMenuIcon;
     std::vector<SVGImage> m_trayIcons;
     std::vector<SVGImage> m_appIcons;
     std::unique_ptr<LauncherMenu> m_launcherMenu;
+    std::unique_ptr<AppMenu> m_appMenu;
     bool m_launcherMenuOpen = false;
+    bool m_appMenuOpen = false;
 };
 
 } // namespace ui
