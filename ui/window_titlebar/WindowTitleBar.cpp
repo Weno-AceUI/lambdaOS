@@ -20,9 +20,9 @@ void WindowTitleBar::loadIcons() {
         img.parse();
         return img;
     };
-    m_iconClose = loadSVG("ui/window_titlebar/icons/close.svg");
-    m_iconMaximize = loadSVG("ui/window_titlebar/icons/Maximize.svg");
-    m_iconMinimize = loadSVG("ui/window_titlebar/icons/Minimize 2.svg");
+    m_iconClose = loadSVG("icons/close.svg");
+    m_iconMaximize = loadSVG("icons/Maximize.svg");
+    m_iconMinimize = loadSVG("icons/Minimize.svg");
     m_iconsLoaded = true;
 }
 
