@@ -21,4 +21,28 @@ namespace ui {
         ctx.drawText(x + width/2 - 30, y + height/2 + 50, "Next", 0xFFFFFFFF);
     }
 }
+
+void WelcomeScreen::setLanguage(const std::string& language) { m_language = language;}
+void WelcomeScreen::setKeymap(const std::string$ keymap) { m_keymap = keymap; }
+void WelcomeScreen::setNetwork(const std::string& network) { m_network = network; }
+const std::string& WelcomeScreen::getLanguage() const { return m_language;}
+const std::string& WelcomeScreen::getKeymap() const { return m_keymap;}
+const std::string& WelcomeScreen::getNetwork() const { return m_network;}
+bool WelcomeScreen::isSubmitted() const { return m_submitted; }
+
+bool WelcomeScreen::onMouseEvent(int mouseX, int mouseY, int button, bool pressed) {
+    // Check if login button clicked
+    // (Assume draw coords are 0,0 for simplicity)
+    if (pressed && mouseX >= 340 && mouseX <= 460 && mouseY >= 330 && mouseY <= 370) {
+        m_submitted = true;
+        return true;
+    }
+    return false;
+}
+
+bool WelcomeScreen::onKeyEvent(int key, bool pressed) {
+    // Placeholder: just print key events
+    std::cout << "Key event: " << key << " pressed: " << pressed << std::endl;
+    return false;
+}
 }
