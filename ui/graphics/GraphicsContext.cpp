@@ -102,6 +102,19 @@ void GraphicsContext::drawRectWithInnerShadow(int x, int y, int width, int heigh
     drawRect(x, y + shadowSize, shadowSize, height - 2 * shadowSize, shadowColor); // left
     drawRect(x + width - shadowSize, y + shadowSize, shadowSize, height - 2 * shadowSize, shadowColor); // right
 }
+void GraphicsContext::drawBackgroundBlur(int x, int y, int width, int height, float blurRadius) {
+    // 1. Grab pixels behind blur area (offscreen buffer or framebuffer region)
+    Image region = readPixels(x, y, width, height); // <-- implement this based on your backend
+
+    // 2. Apply blur to region
+    Image blurred = applyGaussianBlur(region, blurRadius); // <-- implement this or use fast approximation
+
+    // 3. Draw the blurred image back to the same region
+    drawImage(blurred, x, y, width, height);
+
+    // 4. Optional: overlay frosted white tint
+    drawRect(x, y, width, height, 0x40FFFFFF);
+}
 
 const std::vector<uint32_t>& GraphicsContext::getBuffer() const {
     return m_buffer;
