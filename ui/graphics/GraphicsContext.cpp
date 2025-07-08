@@ -85,6 +85,24 @@ void GraphicsContext::drawImage(int x, int y, const Image& img) {
     }
 }
 
+uint32_t makeARGB(uint8_t a, uint8_t r, uint8_t g, uint8_t b) {
+    return (a << 24) | (r << 16) | (g << 8) | b;
+}
+
+void GraphicsContext::drawRectWithInnerShadow(int x, int y, int width, int height,
+                                              uint32_t fillColor,
+                                              uint32_t shadowColor,
+                                              int shadowSize) {
+    // Fill base rectangle
+    drawRect(x, y, width, height, fillColor);
+
+    // Draw 4 inner shadow edges
+    drawRect(x + shadowSize, y, width - 2 * shadowSize, shadowSize, shadowColor); // top
+    drawRect(x + shadowSize, y + height - shadowSize, width - 2 * shadowSize, shadowSize, shadowColor); // bottom
+    drawRect(x, y + shadowSize, shadowSize, height - 2 * shadowSize, shadowColor); // left
+    drawRect(x + width - shadowSize, y + shadowSize, shadowSize, height - 2 * shadowSize, shadowColor); // right
+}
+
 const std::vector<uint32_t>& GraphicsContext::getBuffer() const {
     return m_buffer;
 }
