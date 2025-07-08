@@ -43,7 +43,7 @@ void MenuBar::loadIcons() {
 void MenuBar::draw(GraphicsContext& ctx, int x, int y, int width, int height) {
     loadIcons();
     // Draw menubar background
-    ctx.drawRect(x, y, width, height, 0xFFEFEFEF);
+    ctx.drawRect(x, y, width, height, 0x40FFFFFF);
     // Draw launcher icon
     ctx.drawSVG(x + 8, y + 4, 28, 28, m_launcherIcon);
     // Draw app menu icon (next to launcher)
