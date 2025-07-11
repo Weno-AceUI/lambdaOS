@@ -11,6 +11,7 @@ namespace apps {
         ~Files();
 
         void draw(GraphicsContext& ctx, int x, int y, int width, int height);
+        v
     }
 }
 }

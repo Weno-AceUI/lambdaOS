@@ -1,6 +1,5 @@
 #include "GraphicsContext.h"
 #include "SVGImage.h"
-#include "Image.h"
 #include <cstring>
 #include <iostream>
 #include <cmath>
@@ -71,49 +70,6 @@ void GraphicsContext::drawSVG(int x, int y, int w, int h, const SVGImage& svg) {
     for (const auto& l : svg.lines) {
         drawLine(x + (int)l.x1, y + (int)l.y1, x + (int)l.x2, y + (int)l.y2, l.color);
     }
-}
-
-void GraphicsContext::drawImage(int x, int y, const Image& img) {
-    int w = img.width(), h = img.height();
-    const auto& pixels = img.pixels();
-    for (int j = 0; j < h; ++j) {
-        for (int i = 0; i < w; ++i) {
-            int px = x + i, py = y + j;
-            if (px >= 0 && px < m_width && py >= 0 && py < m_height)
-                m_buffer[py * m_width + px] = pixels[j * w + i];
-        }
-    }
-}
-
-uint32_t makeARGB(uint8_t a, uint8_t r, uint8_t g, uint8_t b) {
-    return (a << 24) | (r << 16) | (g << 8) | b;
-}
-
-void GraphicsContext::drawRectWithInnerShadow(int x, int y, int width, int height,
-                                              uint32_t fillColor,
-                                              uint32_t shadowColor,
-                                              int shadowSize) {
-    // Fill base rectangle
-    drawRect(x, y, width, height, fillColor);
-
-    // Draw 4 inner shadow edges
-    drawRect(x + shadowSize, y, width - 2 * shadowSize, shadowSize, shadowColor); // top
-    drawRect(x + shadowSize, y + height - shadowSize, width - 2 * shadowSize, shadowSize, shadowColor); // bottom
-    drawRect(x, y + shadowSize, shadowSize, height - 2 * shadowSize, shadowColor); // left
-    drawRect(x + width - shadowSize, y + shadowSize, shadowSize, height - 2 * shadowSize, shadowColor); // right
-}
-void GraphicsContext::drawBackgroundBlur(int x, int y, int width, int height, float blurRadius) {
-    // 1. Grab pixels behind blur area (offscreen buffer or framebuffer region)
-    Image region = readPixels(x, y, width, height); // <-- implement this based on your backend
-
-    // 2. Apply blur to region
-    Image blurred = applyGaussianBlur(region, blurRadius); // <-- implement this or use fast approximation
-
-    // 3. Draw the blurred image back to the same region
-    drawImage(blurred, x, y, width, height);
-
-    // 4. Optional: overlay frosted white tint
-    drawRect(x, y, width, height, 0x40FFFFFF);
 }
 
 const std::vector<uint32_t>& GraphicsContext::getBuffer() const {
